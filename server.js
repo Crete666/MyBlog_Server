@@ -82,6 +82,54 @@ app.get("/boards", (req, res) => {
     });
 });
 
+app.get("/boards/:id", (req, res) => {
+  const params = req.params;
+  const { id, eventId } = params;
+  models.Board.findOne({
+    where: {
+      id: id,
+    },
+  })
+    .then((result) => {
+      console.log("BOARD : ", result);
+      res.send({
+        board: result,
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      res.send("게시글 불러오기 에러 발생");
+    });
+});
+
+app.get("/boardsRecently", async (req, res) => {
+  var max = 0;
+  await models.Board.max("id")
+    .then((result) => {
+      console.log("max id : ", result);
+      max = result;
+      console.log("max : ", max);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  models.Board.findOne({
+    where: {
+      id: parseInt(max),
+    },
+  })
+    .then((result) => {
+      console.log("BOARD : ", result);
+      res.send({
+        board: result,
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      res.send("게시글 불러오기 에러 발생");
+    });
+});
+
 app.get("/projects", (req, res) => {
   models.Project.findAll({
     limit: 5,
