@@ -65,15 +65,23 @@ app.post("/insertProject", (req, res) => {
 });
 
 app.get("/boards", (req, res) => {
+  const page = req.query.page ? parseInt(req.query.page) : 1;
+  const limit = 5;
+  var total = 0;
+  models.Board.count().then((count) => {
+    total = count;
+  });
   models.Board.findAll({
-    limit: 5,
     order: [["createdAt", "DESC"]],
     attributes: ["title", "createdAt", "id"],
+    offset: (page - 1) * limit,
+    limit: limit,
   })
     .then((result) => {
       console.log("BOARD : ", result);
       res.send({
         board: result,
+        totalCount: total,
       });
     })
     .catch((error) => {
